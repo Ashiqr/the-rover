@@ -1,0 +1,24 @@
+{
+  "name": "the-rover",
+  "version": "1.0.0",
+  "description": "Drive the Rover",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ashiqr/the-rover.git"
+  },
+  "author": "Ashiq Ramlucken",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ashiqr/the-rover/issues"
+  },
+  "homepage": "https://github.com/Ashiqr/the-rover#readme",
+  "dependencies": {
+    "jest": "^26.6.3",
+    "jest-each": "^26.6.2"
+  }
+}
