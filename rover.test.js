@@ -84,6 +84,40 @@ describe('move for a command', () => {
         ['FLFFFRFLBFFFFFFFFFFRFFFFF', { x: -12, y: -7, heading: 'North' }]
     ]).it("when the input is '%s'", (command, expected) => {
         let robot = new rover();
-        expect(robot.move(command)).toStrictEqual(expected);
+        const result = robot.move(command);
+        expect(result.location).toStrictEqual(expected);
+    });
+})
+
+describe('Check forward obstacle', () => {
+    each([
+        [[[11,10]], true],
+        [[[9,10]], false]
+    ]).it("when the input is '%s'", (obstacles, expected) => {
+        let robot = new rover({ x: 10, y: 10, heading: 'East' }, obstacles);
+        if (expected){
+            expect(robot.checkForwardObstacle()).toBeDefined();
+        }
+        else{
+            expect(robot.checkForwardObstacle()).toBeUndefined();
+        }
+        
+    });
+})
+
+
+describe('Check backward obstacle', () => {
+    each([
+        [[[11,10]], false],
+        [[[9,10]], true]
+    ]).it("when the input is '%s'", (obstacles, expected) => {
+        let robot = new rover({ x: 10, y: 10, heading: 'East' }, obstacles);
+        if (expected){
+            expect(robot.checkBackwardObstacle()).toBeDefined();
+        }
+        else{
+            expect(robot.checkBackwardObstacle()).toBeUndefined();
+        }
+        
     });
 })

@@ -1,9 +1,23 @@
 class rover {
-    constructor(landedLocation, obstacles, destination) {
+
+    // Heading can change by going forward, example crossing the North pole
+    forwardAction = {
+        'North' : () => { return {x: this.location.x, y: this.location.y - 1, heading: this.location.heading} },
+        'South' : () => { return {x: this.location.x, y: this.location.y + 1, heading: this.location.heading} },
+        'East' : () => { return {x: this.location.x + 1, y: this.location.y, heading: this.location.heading} },
+        'West' : () => { return {x: this.location.x - 1, y: this.location.y, heading: this.location.heading} },
+    };
+
+    backwardAction = {
+        'North' : () => { return {x: this.location.x, y: this.location.y + 1, heading: this.location.heading} },
+        'South' : () => { return {x: this.location.x, y: this.location.y - 1, heading: this.location.heading} },
+        'East' : () => { return {x: this.location.x - 1, y: this.location.y, heading: this.location.heading} },
+        'West' : () => { return {x: this.location.x + 1, y: this.location.y, heading: this.location.heading} },
+    };
+
+    constructor(landedLocation, obstacles) {
         this.location = landedLocation || {x: 0, y: 0, heading: 'North'};
         this.knownObstacles = obstacles || [];
-        this.destination = destination || [];
-        this.message = null;
     }
 
     validateMessage(message) {
@@ -13,14 +27,10 @@ class rover {
         return false;
     }
 
-    go(message){
-        if (!this.validateMessage(message)){
+    move(command) {
+        if (!this.validateMessage(command)){
             throw 'Invalid message';
         }
-        return this.move(message);
-    }
-
-    move(command){
         const action = {
             'F' : () => { this.moveForward() },
             'B' : () => { this.moveBack() },
@@ -28,30 +38,22 @@ class rover {
             'R' : () => { this.rotateRight() },
         };
         const instructions = command.split('');
-        for(let i = 0, len = instructions.length; i < len; i++){
+        for(let i = 0, len = instructions.length; i < len; i++) {
+            if ((instructions[i] === 'F' && this.checkForwardObstacle())
+                || (instructions[i] === 'B' && this.checkBackwardObstacle()) ) {
+                    return { location: this.location, status: 'Stopped. Obstacle in path' };
+            }
             action[instructions[i]]();
         }
-        return this.location;
+        return { location: this.location, status: 'complete' };
     }
 
     moveForward() {
-        const action = {
-            'North' : () => {this.location.y -= 1},
-            'South' : () => {this.location.y += 1},
-            'East' : () => {this.location.x += 1},
-            'West' : () => {this.location.x -= 1},
-        };
-        action[this.location.heading]();
+        this.location = this.forwardAction[this.location.heading]();
     }
 
     moveBack() {
-        const action = {
-            'North' : () => {this.location.y += 1},
-            'South' : () => {this.location.y -= 1},
-            'East' : () => {this.location.x -= 1},
-            'West' : () => {this.location.x += 1},
-        };
-        action[this.location.heading]();
+        this.location = this.backwardAction[this.location.heading]();
     }
 
     rotateLeft() {
@@ -73,5 +75,16 @@ class rover {
         };
         this.location.heading = action[this.location.heading];
     }
+
+    checkForwardObstacle() {
+        const nextLocation = this.forwardAction[this.location.heading]();
+        return this.knownObstacles.find(o => o[0] === nextLocation.x && o[1] === nextLocation.y);
+    }
+
+    checkBackwardObstacle() {
+        const nextLocation = this.backwardAction[this.location.heading]();
+        return this.knownObstacles.find(o => o[0] === nextLocation.x && o[1] === nextLocation.y);
+    }
 }
+
 exports.rover = rover;
