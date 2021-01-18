@@ -1,6 +1,5 @@
-const rover = require('./rover.js').rover;
 const each = require('jest-each').default;
-
+const rover = require('./rover.js').rover;
 
 describe('Valid message return true', () => {
     each([
@@ -23,6 +22,22 @@ describe('Valid message return false', () => {
     ]).it("when the input is '%s'", (command) => {
         let robot = new rover();
         expect(robot.validateMessage(command)).toBeFalsy();
+    });
+})
+
+describe('Valid locations', () => {
+    each([
+        [{x: 0, y: 0, heading: 'North'}, true],
+        [{x: 0, y: 'f', heading: 'North'}, false],
+        [{x: 0, y: 8, heading: 'This way'}, false],
+    ]).it("when the input is '%s'", (location, expected) => {
+        let robot = new rover(location);
+        if (expected) {
+            expect(robot.validateLocation()).toBeUndefined();
+        }
+        else {
+            expect(() => robot.validateLocation()).toThrow();
+        }
     });
 })
 
@@ -78,17 +93,6 @@ describe('Rotate Right', () => {
     });
 })
 
-describe('move for a command', () => {
-    each([
-        ['FLFFFRFLB', { x: -2, y: -2, heading: 'West' }],
-        ['FLFFFRFLBFFFFFFFFFFRFFFFF', { x: -12, y: -7, heading: 'North' }]
-    ]).it("when the input is '%s'", (command, expected) => {
-        let robot = new rover();
-        const result = robot.move(command);
-        expect(result.location).toStrictEqual(expected);
-    });
-})
-
 describe('Check forward obstacle', () => {
     each([
         [[[11,10]], true],
@@ -105,7 +109,6 @@ describe('Check forward obstacle', () => {
     });
 })
 
-
 describe('Check backward obstacle', () => {
     each([
         [[[11,10]], false],
@@ -119,5 +122,16 @@ describe('Check backward obstacle', () => {
             expect(robot.checkBackwardObstacle()).toBeUndefined();
         }
         
+    });
+})
+
+describe('move for a command', () => {
+    each([
+        ['FLFFFRFLB', { x: -2, y: -2, heading: 'West' }],
+        ['FLFFFRFLBFFFFFFFFFFRFFFFF', { x: -12, y: -7, heading: 'North' }]
+    ]).it("when the input is '%s'", (command, expected) => {
+        let robot = new rover();
+        const result = robot.move(command);
+        expect(result.location).toStrictEqual(expected);
     });
 })

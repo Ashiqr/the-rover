@@ -20,6 +20,16 @@ class rover {
         this.knownObstacles = obstacles || [];
     }
 
+    validateLocation(){
+        if (isNaN(this.location.x) || isNaN(this.location.y)){
+            throw 'Location coordinates are invalid';
+        }
+        const validHeading = ['North', 'South', 'East', 'West'];
+        if (validHeading.indexOf(this.location.heading) < 0){
+            throw 'Invalid Heading. Allowed options are : North, South, East and West';
+        }
+    }
+
     validateMessage(message) {
         if (message) {
             return message.match(/^[FBLR]*$/);
@@ -29,8 +39,9 @@ class rover {
 
     move(command) {
         if (!this.validateMessage(command)){
-            throw 'Invalid message';
+            throw 'Invalid message. Allowed options are : F, B, L, or R. example FFBLR';
         }
+        this.validateLocation();
         const action = {
             'F' : () => { this.moveForward() },
             'B' : () => { this.moveBack() },
